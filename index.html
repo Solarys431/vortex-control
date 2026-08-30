@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="referrer" content="no-referrer" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self'; frame-src 'self'; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests" />
+<title>VORTEX Regia — prototipo di regia software</title>
+<meta name="description" data-i18n-attr="content" data-i18n="meta.desc" content="Prototipo funzionale di regia software con switching, rundown, audio broadcast, grafiche, replay e automazione AI. Schermate del prodotto con dati dimostrativi." />
+<meta name="theme-color" content="#070809" />
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<style>
+  :root{
+    --void:#070809; --void2:#0a0d10; --panel:#11151a; --panel2:#161b21; --well:#0a0d10;
+    --edge:#2e3a46; --edge-hi:#4a5865; --line:#222b34; --line-soft:rgba(255,255,255,.06);
+    --pgm:#ff2a39; --pgm-glow:rgba(255,42,57,.55); --pvw:#16e27d; --pvw-glow:rgba(22,226,125,.45);
+    --amber:#ffb02e; --cyan:#3fd7ea; --violet:#b06ad9;
+    --ink:#e2e9f0; --dim:#a2afbc; --dim2:#83919e; --maxw:1220px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;overflow-x:hidden}
+  body{background:radial-gradient(1300px 700px at 82% -10%, #141a21 0%, transparent 60%),radial-gradient(900px 500px at 5% 20%,#0f151b 0%,transparent 55%),var(--void);color:var(--ink);font-family:'Saira',system-ui,sans-serif;font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  img{max-width:100%;display:block} a{color:inherit;text-decoration:none} ::selection{background:var(--pgm);color:#fff}
+  a:focus-visible,button:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+  .skip-link{position:fixed;top:8px;left:8px;z-index:1000;padding:10px 14px;border-radius:8px;background:var(--ink);color:var(--void);font-weight:700;transform:translateY(-150%)}.skip-link:focus{transform:none}
+  .mono{font-family:'JetBrains Mono',monospace} .cond{font-family:'Saira Condensed',sans-serif}
+  h1,h2,h3{font-family:'Saira',sans-serif;font-weight:700;letter-spacing:-.02em;line-height:1.04}
+  .eyebrow{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.28em;text-transform:uppercase;color:var(--cyan);display:inline-flex;align-items:center;gap:10px}
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--cyan);opacity:.7}
+  .eyebrow.pgm{color:var(--pgm)} .eyebrow.pgm::before{background:var(--pgm)}
+  .eyebrow.violet{color:var(--violet)} .eyebrow.violet::before{background:var(--violet)}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+
+  nav{position:sticky;top:0;z-index:60;background:rgba(7,8,9,.72);backdrop-filter:blur(16px);border-bottom:1px solid var(--line-soft)}
+  .navin{max-width:var(--maxw);margin:0 auto;padding:14px 26px;display:flex;align-items:center;gap:18px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:21px}
+    .brand .brand-logo{width:26px;height:26px;object-fit:contain;display:block;filter:drop-shadow(0 0 9px rgba(56,204,255,.55))}
+  .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--pgm);box-shadow:0 0 14px var(--pgm-glow);animation:pulse 2s infinite}
+  .brand small{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:11px;letter-spacing:.22em;color:var(--dim2);text-transform:uppercase}
+  .back{font-size:14px;color:var(--dim);border:1px solid var(--line);border-radius:8px;padding:6px 12px} .back:hover{color:var(--ink);border-color:var(--edge)}
+  .navright{margin-left:auto;display:flex;align-items:center;gap:14px}
+  .repo-link{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--dim);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+  .repo-link:hover{color:var(--ink);border-color:var(--edge-hi)}
+  .langsw{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700}
+  .langsw button{background:transparent;color:var(--dim2);border:0;padding:6px 10px;cursor:pointer} .langsw button.on{background:var(--cyan);color:#04222a}
+  .navcta{background:var(--pgm);color:#fff;padding:9px 17px;border-radius:9px;font-weight:600;font-size:14.5px}
+
+  section{padding:74px 0;position:relative}
+  .hero{padding:60px 0 30px;text-align:center}
+  .hero h1{font-size:clamp(38px,5.4vw,68px);margin:16px auto 0;max-width:900px}
+  .hero h1 .air{color:var(--pgm)}
+  .hero .lead{font-size:19px;color:var(--dim);max-width:620px;margin:18px auto 0}
+  .hero .lead b{color:var(--ink);font-weight:600}
+  .hero-cta{display:flex;gap:14px;margin-top:28px;justify-content:center;flex-wrap:wrap}
+  .btn{padding:13px 22px;border-radius:10px;font-weight:600;font-size:15.5px;cursor:pointer;border:1px solid transparent;transition:transform .16s}
+  .btn.primary{background:var(--pgm);color:#fff;box-shadow:0 14px 34px -12px var(--pgm-glow)} .btn.primary:hover{transform:translateY(-2px)}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--edge)} .btn.ghost:hover{border-color:var(--edge-hi)}
+
+  /* frame "app" per gli screenshot reali */
+  .shot{border-radius:13px;overflow:hidden;border:1px solid var(--edge);background:#0c1013;box-shadow:0 50px 120px -40px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.02)}
+  .shot .bar{display:flex;align-items:center;gap:12px;padding:9px 14px;background:linear-gradient(180deg,#0e1318,#0b0e12);border-bottom:1px solid var(--line-soft)}
+  .shot .bar .dots{display:flex;gap:7px} .shot .bar .dots i{width:11px;height:11px;border-radius:50%;display:block}
+  .shot .bar .dots i:nth-child(1){background:#ff5f57} .shot .bar .dots i:nth-child(2){background:#febc2e} .shot .bar .dots i:nth-child(3){background:#28c840}
+  .shot .bar .u{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.06em;color:var(--dim2);display:flex;align-items:center;gap:8px}
+  .shot .bar .u .live{width:7px;height:7px;border-radius:50%;background:var(--pgm);box-shadow:0 0 8px var(--pgm-glow);animation:pulse 1.6s infinite}
+  .shot .vp{position:relative;overflow:hidden;background:#05070a}
+  .shot .vp img,.shot .vp video{width:100%;display:block}
+  .shot.kb .vp img{animation:kenburns 26s ease-in-out infinite alternate;transform-origin:60% 45%}
+
+  .hero-shot{max-width:1080px;margin:38px auto 0;position:relative}
+  .hero-shot::after{content:"";position:absolute;inset:-2px;border-radius:15px;box-shadow:0 0 90px -20px var(--pgm-glow);pointer-events:none;opacity:.6;animation:breathe 4s ease-in-out infinite}
+  .hero-proof{display:flex;gap:22px;margin:26px auto 0;justify-content:center;flex-wrap:wrap;font-family:'Saira Condensed',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim2);font-weight:600}
+  .hero-proof span{display:flex;align-items:center;gap:8px} .hero-proof i{width:6px;height:6px;border-radius:50%;background:var(--pvw);box-shadow:0 0 8px var(--pvw-glow)}
+
+  .sec-head{max-width:780px} .sec-head.center{margin:0 auto;text-align:center}
+  .sec-head h2{font-size:clamp(28px,3.8vw,44px);margin:14px 0 0} .sec-head p{color:var(--dim);font-size:18px;margin-top:14px}
+
+  /* cuore AI — schermata grande + badge */
+  .core{margin-top:40px;position:relative}
+  .badges{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:26px}
+  .chip{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:30px;padding:9px 16px;background:var(--panel);font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px;letter-spacing:.03em;opacity:0;transform:translateY(10px);transition:opacity .5s,transform .5s}
+  .chip.in{opacity:1;transform:none}
+  .chip b{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px}
+  .chip .d{width:8px;height:8px;border-radius:50%;flex:none}
+  .chip.c1 .d{background:var(--pgm);box-shadow:0 0 8px var(--pgm-glow)} .chip.c1 b{color:#ff6b76}
+  .chip.c2 .d{background:var(--cyan);box-shadow:0 0 8px rgba(63,215,234,.5)} .chip.c2 b{color:var(--cyan)}
+  .chip.c3 .d{background:var(--violet);box-shadow:0 0 8px rgba(176,106,217,.5)} .chip.c3 b{color:#c58fe0}
+  .chip.c4 .d{background:var(--pvw);box-shadow:0 0 8px var(--pvw-glow)} .chip.c4 b{color:var(--pvw)}
+
+  /* prod row: testo + schermata */
+  .prod{display:grid;grid-template-columns:1.05fr 1.35fr;gap:44px;align-items:center;margin-top:40px}
+  .prod.rev .prod-copy{order:2} .prod.rev .prod-ui{order:1}
+  .prod-copy h3{font-size:clamp(23px,2.9vw,33px)} .prod-copy .sub{color:var(--dim);font-size:17px;margin-top:12px}
+  .flist{list-style:none;margin:20px 0 0;display:flex;flex-direction:column;gap:10px}
+  .flist li{display:flex;gap:11px;font-size:15.5px} .flist li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--cyan);margin-top:9px;flex:none;box-shadow:0 0 8px rgba(63,215,234,.5)}
+  .flist li.ai::before{background:var(--violet);box-shadow:0 0 8px rgba(176,106,217,.5)}
+
+  /* galleria "tutto il resto" */
+  .gal{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-top:38px}
+  .gcard .gc-h{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);margin:14px 2px 0;display:flex;align-items:center;gap:9px}
+  .gcard .gc-h i{width:7px;height:7px;border-radius:50%;background:var(--cyan);flex:none}
+  .gcard .gc-h.ai i{background:var(--violet)}
+  .gcard .gc-p{color:var(--dim);font-size:14.5px;margin:4px 2px 0}
+  .prodcta{display:inline-flex;align-items:center;gap:9px;margin-top:26px;font-weight:600;font-size:16px;border-bottom:2px solid var(--pgm);padding-bottom:3px;transition:gap .18s} .prodcta:hover{gap:15px} .prodcta .ar{color:var(--pgm)}
+
+  .closing{text-align:center;padding:96px 0 70px} .closing h2{font-size:clamp(34px,5vw,62px)} .closing h2 .v{color:var(--pgm)}
+  .closing p{color:var(--dim);font-size:18px;margin:18px auto 0;max-width:560px} .closing .hero-cta{margin-top:28px}
+  footer{border-top:1px solid var(--line-soft);padding:36px 0 56px;color:var(--dim2)}
+  .footin{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+  .footlinks{margin-left:auto;display:flex;gap:20px;font-size:14px} .footlinks a:hover{color:var(--ink)}
+  .foot-copy{width:100%;font-size:12.5px;font-family:'JetBrains Mono',monospace;margin-top:8px}
+
+  .rv{opacity:0;transform:translateY(30px) scale(.985);transition:opacity .8s cubic-bezier(.2,.8,.2,1),transform .8s cubic-bezier(.2,.8,.2,1)} .rv.in{opacity:1;transform:none}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @keyframes kenburns{0%{transform:scale(1)}100%{transform:scale(1.07)}}
+  @keyframes breathe{0%,100%{opacity:.4}50%{opacity:.75}}
+  @media (max-width:900px){.prod,.prod.rev{grid-template-columns:1fr;gap:28px}.prod.rev .prod-copy,.prod.rev .prod-ui{order:0}.gal{grid-template-columns:1fr}}
+  @media (max-width:560px){.navin{padding-left:20px;padding-right:20px}.back,.navcta{display:none}.langsw{flex-shrink:0}}
+  @media (max-width:400px){.brand{font-size:18px;gap:8px}.brand .brand-logo{width:22px;height:22px}.brand small{display:none}.navin{gap:8px}.navright{gap:5px}.repo-link{font-size:10px;padding:6px}.langsw button{padding:6px 7px}.shot,.bar{overflow:hidden}.bar .u{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.footlinks{width:100%;margin-left:0;gap:12px;flex-wrap:wrap}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}.rv{opacity:1;transform:none}.chip{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main" data-i18n="skip">Salta al contenuto</a>
+<nav><div class="navin">
+  <a class="brand" href="../vortex-site/"><img src="assets/vortex-mark.png" class="brand-logo" alt="">VORTEX<span class="dot"></span><small>Regia</small></a>
+  <a class="back" href="../vortex-site/">← <span data-i18n="nav.eco">Ecosistema</span></a>
+  <div class="navright">
+    <a class="repo-link" href="https://github.com/Solarys431/vortex-control" aria-label="GitHub repository">GitHub</a>
+    <div class="langsw" role="group" aria-label="Lingua / Language"><button type="button" data-lang="it" class="on" aria-pressed="true">IT</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
+    <a class="navcta" href="#cuore" data-i18n="nav.cta">Scopri di più</a>
+  </div>
+</div></nav>
+
+<!-- HERO -->
+<header class="hero" id="main"><div class="wrap">
+  <span class="eyebrow pgm" data-i18n="hero.eyebrow">VORTEX Regia · prototipo funzionale</span>
+  <h1 data-i18n-html="hero.h1">La regia, <span class="air">in un unico ambiente software.</span></h1>
+  <p class="lead" data-i18n-html="hero.lead">Prototipo funzionale con switching, rundown, audio broadcast, grafiche, replay e automazione AI. <b>Le schermate mostrano il software reale con dati dimostrativi.</b></p>
+  <div class="hero-cta">
+    <a class="btn primary" href="#cuore" data-i18n="hero.cta1">Scopri di più</a>
+  </div>
+  <div class="hero-shot rv"><div class="shot">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="u">VORTEX Regia — plancia di comando <span class="live"></span> DEMO</span></div>
+    <div class="vp"><video src="assets/software-reale/clip-regia.mp4" poster="assets/software-reale/regia.jpg" autoplay muted loop playsinline preload="metadata"></video></div>
+  </div></div>
+  <div class="hero-proof">
+    <span><i></i><span data-i18n="hero.p1">Switcher M/E · DVE · keyer</span></span>
+    <span><i></i><span data-i18n="hero.p2">Audio 18 canali</span></span>
+    <span><i></i><span data-i18n="hero.p3">NewsIntelligence</span></span>
+    <span><i></i><span data-i18n="hero.p4">Diretta multi-destinazione</span></span>
+  </div>
+</div></header>
+
+<!-- CUORE AI -->
+<section id="cuore"><div class="wrap">
+  <div class="sec-head center rv">
+    <span class="eyebrow violet" style="justify-content:center" data-i18n="core.eyebrow">Il cuore · NewsIntelligence</span>
+    <h2 data-i18n="core.h2">NewsIntelligence suggerisce. Tu resti al comando.</h2>
+    <p data-i18n="core.p">Raccoglie le notizie dalle fonti configurate, ne valuta importanza e rilevanza e suggerisce la scaletta del TG. Regia e redazione decidono cosa va in onda.</p>
+  </div>
+  <div class="core rv"><div class="shot">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="u">VORTEX Regia — Rundown · <span class="live"></span> NEWSINTELLIGENCE</span></div>
+    <div class="vp"><video src="assets/software-reale/clip-news.mp4" poster="assets/software-reale/newsintelligence.jpg" autoplay muted loop playsinline preload="metadata"></video></div>
+  </div>
+  <div class="badges" id="coreBadges">
+    <span class="chip c1"><span class="d"></span><span data-i18n="core.b1">14 notizie · ed. sera</span></span>
+    <span class="chip c2"><span class="d"></span><b>IMP&nbsp;99</b> · <b>TG&nbsp;99</b></span>
+    <span class="chip c3"><span class="d"></span><span data-i18n="core.b3">NewsIntelligence</span></span>
+    <span class="chip c4"><span class="d"></span><span data-i18n="core.b4">Tu scegli · TAKE</span></span>
+  </div></div>
+</div></section>
+
+<!-- AUDIO -->
+<section><div class="wrap"><div class="prod">
+  <div class="prod-copy rv">
+    <span class="eyebrow" data-i18n="au.eyebrow">Audio broadcast</span>
+    <h3 data-i18n="au.h3">Una console broadcast a 18 canali.</h3>
+    <p class="sub" data-i18n="au.sub">Ogni canale con filtro passa-alto, EQ parametrico, gate, compressore e limiter. Mix-minus per i remoti, monitoraggio loudness LUFS-S stimato e snapshot di scena.</p>
+    <ul class="flist">
+      <li data-i18n="au.f1">HPF, EQ, gate, compressore, limiter per canale</li>
+      <li data-i18n="au.f2">N-1 (mix-minus) per ogni collegamento</li>
+      <li class="ai" data-i18n="au.f3">«Alza Giulia», «gate sull'ospite»: comandi a voce</li>
+    </ul>
+  </div>
+  <div class="prod-ui rv"><div class="shot">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="u">VORTEX Regia — Audio Mixer</span></div>
+    <div class="vp"><video src="assets/software-reale/clip-audio.mp4" poster="assets/software-reale/audio.jpg" autoplay muted loop playsinline preload="metadata"></video></div>
+  </div></div>
+</div></div></section>
+
+<!-- GRAFICHE AI -->
+<section><div class="wrap"><div class="prod rev">
+  <div class="prod-copy rv">
+    <span class="eyebrow violet" data-i18n="gfx.eyebrow">Grafiche · contenuti assistiti dall'AI</span>
+    <h3 data-i18n="gfx.h3">L'AI prepara i contenuti. Tu mandi in onda il template.</h3>
+    <p class="sub" data-i18n="gfx.sub">Banco CG in standard SPX-GC: sottopancia, ticker, promo, classifiche e meteo. Da un brief, Gemini compila i contenuti dei template disponibili; tu verifichi la preview e fai TAKE.</p>
+    <ul class="flist">
+      <li data-i18n="gfx.f1">Template broadcast pronti, take in/out reali</li>
+      <li class="ai" data-i18n="gfx.f2">Brief → contenuti del template compilati con Gemini</li>
+      <li data-i18n="gfx.f3">Preview e Program, in chiave sul DSK</li>
+    </ul>
+  </div>
+  <div class="prod-ui rv"><div class="shot">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="u">VORTEX Regia — Grafiche · banco CG</span></div>
+    <div class="vp"><img src="assets/software-reale/grafiche.jpg" alt="Banco grafiche CG con generazione AI"></div>
+  </div></div>
+</div></div></section>
+
+<!-- SWITCHER / DVE -->
+<section><div class="wrap"><div class="prod">
+  <div class="prod-copy rv">
+    <span class="eyebrow pgm" data-i18n="sw.eyebrow">Lo switcher</span>
+    <h3 data-i18n="sw.h3">M/E, keyer e DVE con keyframe.</h3>
+    <p class="sub" data-i18n="sw.sub">Quattro keyer upstream e due DSK, luma e chroma key, fly key con posizione, scala, rotazione e keyframe. Program, Preview e controllo delle transizioni con la T-bar.</p>
+    <ul class="flist">
+      <li data-i18n="sw.f1">Transizioni CUT, MIX, DIP, 9 pattern WIPE</li>
+      <li data-i18n="sw.f2">DVE per composizioni e PiP, keyer DSK</li>
+      <li class="ai" data-i18n="sw.f3">«AIRSPEED 2 in onda»: la regia esegue</li>
+    </ul>
+  </div>
+  <div class="prod-ui rv"><div class="shot">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="u">VORTEX Regia — DVE / Key</span></div>
+    <div class="vp"><img src="assets/software-reale/dve.jpg" alt="Keyer e DVE con keyframe"></div>
+  </div></div>
+</div></div></section>
+
+<!-- GALLERIA: tutto il resto -->
+<section><div class="wrap">
+  <div class="sec-head center rv">
+    <span class="eyebrow" style="justify-content:center" data-i18n="gal.eyebrow">Moduli del prototipo</span>
+    <h2 data-i18n="gal.h2">Un flusso di regia integrato.</h2>
+    <p data-i18n="gal.p">I moduli già presenti nel prototipo e le integrazioni hardware previste.</p>
+  </div>
+  <div class="gal">
+    <div class="gcard rv"><div class="shot"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="u">Multiview</span></div><div class="vp"><img src="assets/software-reale/multiview.jpg" alt="Multiview configurabile"></div></div><div class="gc-h"><i></i>Multiview</div><p class="gc-p" data-i18n="gal.g1">Mosaici 2×2 → 5×5, UMD, orologio, area di sicurezza e tally.</p></div>
+    <div class="gcard rv"><div class="shot"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="u">Tally</span></div><div class="vp"><img src="assets/software-reale/tally.jpg" alt="Sistema tally TSL"></div></div><div class="gc-h"><i></i>Tally</div><p class="gc-p" data-i18n="gal.g2">Supporto UMD, TSL 3.1/5.0, GPIO e Smart Tally.</p></div>
+    <div class="gcard rv"><div class="shot"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="u">Matrice</span></div><div class="vp"><img src="assets/software-reale/matrice.jpg" alt="Router a crosspoint"></div></div><div class="gc-h"><i></i>Matrice</div><p class="gc-p" data-i18n="gal.g3">Router a crosspoint: PGM, Clean, AUX, REC e Stream.</p></div>
+    <div class="gcard rv"><div class="shot"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="u">Intercom</span></div><div class="vp"><img src="assets/software-reale/intercom.jpg" alt="Matrice intercom"></div></div><div class="gc-h"><i></i>Intercom</div><p class="gc-p" data-i18n="gal.g4">Talk/listen, partyline, IFB e fino a 16 N-1 su interfacce compatibili.</p></div>
+    <div class="gcard rv"><div class="shot"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="u">Replay</span></div><div class="vp"><img src="assets/software-reale/replay.jpg" alt="Replay VORTEX"></div></div><div class="gc-h"><i></i>Replay</div><p class="gc-p" data-i18n="gal.g5">Replay da file e webcam; acquisizione DeckLink in sviluppo.</p></div>
+    <div class="gcard rv"><div class="shot"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="u">Media</span></div><div class="vp"><img src="assets/software-reale/media.jpg" alt="Media server"></div></div><div class="gc-h"><i></i>Media</div><p class="gc-p" data-i18n="gal.g6">Video server: playout delle clip con cue, trim e roll.</p></div>
+    <div class="gcard rv"><div class="shot"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="u">Log</span></div><div class="vp"><img src="assets/software-reale/log.jpg" alt="Log e diagnostica"></div></div><div class="gc-h ai"><i></i>Diagnostica AI</div><p class="gc-p" data-i18n="gal.g7">Eventi, dispositivi, prestazioni e allarmi, con analisi AI.</p></div>
+    <div class="gcard rv"><div class="shot"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="u">Regia</span></div><div class="vp"><img src="assets/software-reale/regia.jpg" alt="Plancia di regia"></div></div><div class="gc-h"><i></i>Plancia</div><p class="gc-p" data-i18n="gal.g8">Program, Preview, bus, transizioni, audio e intercom a portata di mano.</p></div>
+  </div>
+</div></section>
+
+<!-- CLOSING -->
+<section class="closing" id="demo"><div class="wrap rv">
+  <span class="eyebrow pgm" style="justify-content:center" data-i18n="cl.eyebrow">VORTEX Regia</span>
+  <h2 data-i18n-html="cl.h2">Un prototipo da <span class="v">portare in produzione.</span></h2>
+  <p data-i18n="cl.p">Dalla prima notizia alla messa in onda, i moduli principali sono riuniti in un solo ambiente software e restano da validare sul campo.</p>
+  <div class="hero-cta">
+    <a class="btn primary" href="../vortex-site/" data-i18n="cl.cta2">Torna all'ecosistema</a>
+  </div>
+</div></section>
+
+<footer><div class="wrap"><div class="footin">
+  <a class="brand" href="../vortex-site/"><img src="assets/vortex-mark.png" class="brand-logo" alt="">VORTEX<span class="dot"></span></a>
+  <div class="footlinks"><a href="../vortex-site/" data-i18n="nav.eco">Ecosistema</a><a href="../vortex-intercom/">Intercom</a><a href="../vortex-communication-os/">Meet</a><a href="../vortex-ai-graphic-studio/" data-i18n="nav.graphics">Grafiche</a></div>
+  <div class="foot-copy">© 2026 VORTEX · comms — <span data-i18n="foot.rights">tutti i diritti riservati</span> · <span data-i18n="foot.privacy">La landing non usa cookie, analytics, profilazione o raccolta dati</span></div>
+</div></div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var I18N={
+    it:{
+      "meta.title":"VORTEX Regia — prototipo di regia software",
+      "skip":"Salta al contenuto",
+      "meta.desc":"Prototipo funzionale di regia software con switching, rundown, audio broadcast, grafiche, replay e automazione AI. Schermate del prodotto con dati dimostrativi.",
+      "nav.eco":"Ecosistema","nav.graphics":"Grafiche","nav.cta":"Scopri di più",
+      "hero.eyebrow":"VORTEX Regia · prototipo funzionale","hero.h1":"La regia, <span class='air'>in un unico ambiente software.</span>",
+      "hero.lead":"Prototipo funzionale con switching, rundown, audio broadcast, grafiche, replay e automazione AI. <b>Le schermate mostrano il software reale con dati dimostrativi.</b>",
+      "hero.cta1":"Scopri di più","hero.cta2":"Vedi il cuore AI",
+      "hero.p1":"Switcher M/E · DVE · keyer","hero.p2":"Audio 18 canali","hero.p3":"NewsIntelligence","hero.p4":"Diretta multi-destinazione",
+      "core.eyebrow":"Il cuore · NewsIntelligence","core.h2":"NewsIntelligence suggerisce. Tu resti al comando.",
+      "core.p":"Raccoglie le notizie dalle fonti configurate, ne valuta importanza e rilevanza e suggerisce la scaletta del TG. Regia e redazione decidono cosa va in onda.",
+      "core.b1":"14 notizie · ed. sera","core.b3":"NewsIntelligence","core.b4":"Tu scegli · TAKE",
+      "au.eyebrow":"Audio broadcast","au.h3":"Una console broadcast a 18 canali.",
+      "au.sub":"Ogni canale con filtro passa-alto, EQ parametrico, gate, compressore e limiter. Mix-minus per i remoti, monitoraggio loudness LUFS-S stimato e snapshot di scena.",
+      "au.f1":"HPF, EQ, gate, compressore, limiter per canale","au.f2":"N-1 (mix-minus) per ogni collegamento","au.f3":"«Alza Giulia», «gate sull'ospite»: comandi a voce",
+      "gfx.eyebrow":"Grafiche · contenuti assistiti dall'AI","gfx.h3":"L'AI prepara i contenuti. Tu mandi in onda il template.",
+      "gfx.sub":"Banco CG in standard SPX-GC: sottopancia, ticker, promo, classifiche e meteo. Da un brief, Gemini compila i contenuti dei template disponibili; tu verifichi la preview e fai TAKE.",
+      "gfx.f1":"Template broadcast pronti, take in/out reali","gfx.f2":"Brief → contenuti del template compilati con Gemini","gfx.f3":"Preview e Program, in chiave sul DSK",
+      "sw.eyebrow":"Lo switcher","sw.h3":"M/E, keyer e DVE con keyframe.",
+      "sw.sub":"Quattro keyer upstream e due DSK, luma e chroma key, fly key con posizione, scala, rotazione e keyframe. Program, Preview e controllo delle transizioni con la T-bar.",
+      "sw.f1":"Transizioni CUT, MIX, DIP, 9 pattern WIPE","sw.f2":"DVE per composizioni e PiP, keyer DSK","sw.f3":"«AIRSPEED 2 in onda»: la regia esegue",
+      "gal.eyebrow":"Moduli del prototipo","gal.h2":"Un flusso di regia integrato.","gal.p":"I moduli già presenti nel prototipo e le integrazioni hardware previste.",
+      "gal.g1":"Mosaici 2×2 → 5×5, UMD, orologio, area di sicurezza e tally.","gal.g2":"Supporto UMD, TSL 3.1/5.0, GPIO e Smart Tally.","gal.g3":"Router a crosspoint: PGM, Clean, AUX, REC e Stream.","gal.g4":"Talk/listen, partyline, IFB e fino a 16 N-1 su interfacce compatibili.","gal.g5":"Replay da file e webcam; acquisizione DeckLink in sviluppo.","gal.g6":"Video server: playout delle clip con cue, trim e roll.","gal.g7":"Eventi, dispositivi, prestazioni e allarmi, con analisi AI.","gal.g8":"Program, Preview, bus, transizioni, audio e intercom a portata di mano.",
+      "cl.eyebrow":"VORTEX Regia","cl.h2":"Un prototipo da <span class='v'>portare in produzione.</span>",
+      "cl.p":"Dalla prima notizia alla messa in onda, i moduli principali sono riuniti in un solo ambiente software e restano da validare sul campo.","cl.cta1":"Scopri di più","cl.cta2":"Torna all'ecosistema",
+      "foot.rights":"tutti i diritti riservati","foot.privacy":"La landing non usa cookie, analytics, profilazione o raccolta dati"
+    },
+    en:{
+      "meta.title":"VORTEX Regia — functional software control-room prototype",
+      "skip":"Skip to content",
+      "meta.desc":"A functional software control-room prototype with switching, rundown, broadcast audio, graphics, replay and AI automation. Product screenshots use demonstration data.",
+      "nav.eco":"Ecosystem","nav.graphics":"Graphics","nav.cta":"Learn more",
+      "hero.eyebrow":"VORTEX Regia · functional prototype","hero.h1":"The control room, <span class='air'>in one software environment.</span>",
+      "hero.lead":"A functional prototype with switching, rundown, broadcast audio, graphics, replay and AI automation. <b>The screenshots show the real software with demonstration data.</b>",
+      "hero.cta1":"Learn more","hero.cta2":"See the AI core",
+      "hero.p1":"M/E switcher · DVE · keyer","hero.p2":"18-channel audio","hero.p3":"NewsIntelligence","hero.p4":"Multi-destination live",
+      "core.eyebrow":"The core · NewsIntelligence","core.h2":"NewsIntelligence suggests. You stay in command.",
+      "core.p":"It gathers news from configured sources, evaluates importance and newscast relevance, and suggests the rundown. The newsroom and control room decide what goes to air.",
+      "core.b1":"14 stories · evening ed.","core.b3":"NewsIntelligence","core.b4":"You choose · TAKE",
+      "au.eyebrow":"Broadcast audio","au.h3":"An 18-channel broadcast console.",
+      "au.sub":"Every channel has a high-pass filter, parametric EQ, gate, compressor and limiter. Mix-minus for remotes, estimated LUFS-S monitoring and scene snapshots.",
+      "au.f1":"HPF, EQ, gate, compressor, limiter per channel","au.f2":"N-1 (mix-minus) for every feed","au.f3":"“Bring up Giulia”, “gate the guest”: by voice",
+      "gfx.eyebrow":"Graphics · AI-assisted content","gfx.h3":"AI prepares the content. You take the template to air.",
+      "gfx.sub":"An SPX-GC CG bank for lower-thirds, tickers, promos, standings and weather. From a brief, Gemini fills the available templates; you verify the preview and TAKE.",
+      "gfx.f1":"Ready broadcast templates, real take in/out","gfx.f2":"Brief → template content filled with Gemini","gfx.f3":"Preview and Program, keyed on the DSK",
+      "sw.eyebrow":"The switcher","sw.h3":"M/E, keyer and DVE with keyframes.",
+      "sw.sub":"Four upstream keyers and two DSKs, luma and chroma key, fly key with position, scale, rotation and keyframes. Program, Preview and transition control with the T-bar.",
+      "sw.f1":"CUT, MIX, DIP transitions, 9 WIPE patterns","sw.f2":"DVE for composites and PiP, DSK keyer","sw.f3":"“AIRSPEED 2 on air”: the room executes",
+      "gal.eyebrow":"Prototype modules","gal.h2":"An integrated control-room workflow.","gal.p":"Modules already present in the prototype and planned hardware integrations.",
+      "gal.g1":"2×2 → 5×5 mosaics, UMD, clock, safe area, tally.","gal.g2":"Support for UMD, TSL 3.1/5.0, GPIO and Smart Tally.","gal.g3":"Crosspoint router: PGM, Clean, AUX, REC, Stream.","gal.g4":"Talk/listen, party-line, IFB and up to 16 N-1 circuits on compatible interfaces.","gal.g5":"Replay from files and webcams; DeckLink capture is in development.","gal.g6":"Video server: clip playout with cue, trim and roll.","gal.g7":"Events, devices, performance, alarms — with AI analysis.","gal.g8":"Program, Preview, buses, transitions, audio and intercom at hand.",
+      "cl.eyebrow":"VORTEX Regia","cl.h2":"A prototype to <span class='v'>take into production.</span>",
+      "cl.p":"From the first story to going live, the main modules are combined in one software environment and still require field validation.","cl.cta1":"Learn more","cl.cta2":"Back to the ecosystem",
+      "foot.rights":"all rights reserved","foot.privacy":"This landing page uses no cookies, analytics, profiling or data collection"
+    }
+  };
+  function applyLang(lang){
+    var d=I18N[lang]||I18N.it; document.documentElement.lang=lang;
+    document.title=d["meta.title"]||document.title;
+    document.querySelectorAll('[data-i18n]').forEach(function(el){var k=el.getAttribute('data-i18n'); if(d[k]!=null) el.textContent=d[k];});
+    document.querySelectorAll('[data-i18n-html]').forEach(function(el){var k=el.getAttribute('data-i18n-html'); if(d[k]!=null) el.innerHTML=d[k];});
+    document.querySelectorAll('[data-i18n-attr]').forEach(function(el){var a=el.getAttribute('data-i18n-attr'),k=el.getAttribute('data-i18n'); if(d[k]!=null) el.setAttribute(a,d[k]);});
+    document.querySelectorAll('.langsw button').forEach(function(b){var selected=b.getAttribute('data-lang')===lang;b.classList.toggle('on',selected);b.setAttribute('aria-pressed',selected?'true':'false');});
+  }
+  var q=null; try{q=new URLSearchParams(location.search).get('lang');}catch(e){}
+  if(q!=='it'&&q!=='en') q=null;
+  applyLang(q||((navigator.language||'it').toLowerCase().indexOf('it')===0?'it':'en'));
+  document.querySelectorAll('.langsw button').forEach(function(b){b.addEventListener('click',function(){applyLang(b.getAttribute('data-lang'));});});
+
+  var io=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.12});
+  document.querySelectorAll('.rv').forEach(function(el){io.observe(el);});
+
+  // badge del cuore AI: si accendono in sequenza quando entrano
+  var cb=document.getElementById('coreBadges');
+  if(cb){
+    var bo=new IntersectionObserver(function(e){e.forEach(function(x){
+      if(!x.isIntersecting) return;
+      var chips=cb.querySelectorAll('.chip');
+      chips.forEach(function(c,i){ setTimeout(function(){c.classList.add('in');}, 250+i*260); });
+      bo.disconnect();
+    });},{threshold:.3});
+    bo.observe(cb);
+  }
+
+  // parallax leggero sui frame
+  if(!window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+    var shots=Array.prototype.slice.call(document.querySelectorAll('.prod-ui .shot, .gcard .shot'));
+    var ticking=false;
+    function px(){
+      var vh=window.innerHeight;
+      shots.forEach(function(s){
+        var r=s.getBoundingClientRect(); var c=r.top+r.height/2; var off=(c-vh/2)/vh; // -0.5..0.5
+        s.style.transform='translateY('+(off*-14).toFixed(1)+'px)';
+      });
+      ticking=false;
+    }
+    window.addEventListener('scroll',function(){ if(!ticking){ticking=true; requestAnimationFrame(px);} },{passive:true});
+    px();
+  }
+})();
+</script>
+</body>
+</html>
