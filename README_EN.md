@@ -1,6 +1,6 @@
 <div align="center">
 
-<a href="https://solarys431.github.io/vortex-control/"><img src="assets/banner.png" alt="VORTEX Regia — software control-room prototype" width="100%"></a>
+<a href="https://solarys431.github.io/vortex-control/"><img src="assets/banner.png" alt="VORTEX Regia Web — software control-room prototype" width="100%"></a>
 
 <a href="README.md">Italiano</a> · <strong>English</strong>
 
@@ -12,11 +12,11 @@
 
 ## What it is
 
-VORTEX Regia is a **functional prototype** that combines switching, audio mixing, tally, replay, graphics and rundown management in a single software environment. It incorporates **NewsIntelligence**, an AI-powered news aggregator that gathers configured sources, evaluates stories and suggests the newscast rundown, plus a **voice-control layer** for issuing commands. Final decisions remain with the newsroom and control room.
+VORTEX Regia Web is a **functional prototype** that combines switching, audio mixing, tally, replay, graphics and rundown management in a single software environment. It incorporates **NewsIntelligence**, an AI-powered news aggregator that gathers configured sources, evaluates stories and suggests the newscast rundown, plus a **voice-control layer** for issuing commands. Final decisions remain with the newsroom and control room.
 
 The images **show the real product with demonstration data**.
 
-![VORTEX Regia control surface](assets/software-reale/regia.jpg)
+![VORTEX Regia Web control surface](assets/software-reale/regia.jpg)
 
 ---
 

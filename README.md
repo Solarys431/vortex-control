@@ -1,6 +1,6 @@
 <div align="center">
 
-<a href="https://solarys431.github.io/vortex-control/"><img src="assets/banner.png" alt="VORTEX Regia — prototipo di regia software" width="100%"></a>
+<a href="https://solarys431.github.io/vortex-control/"><img src="assets/banner.png" alt="VORTEX Regia Web — prototipo di regia software" width="100%"></a>
 
 <strong>Italiano</strong> · <a href="README_EN.md">English</a>
 
@@ -12,7 +12,7 @@
 
 ## Cos'è
 
-VORTEX Regia è un **prototipo funzionale** che riunisce in un unico ambiente software switching, mixer audio, tally, replay, grafiche e rundown. Incorpora **NewsIntelligence**, un aggregatore di notizie basato sull'AI che raccoglie le fonti configurate, valuta le notizie e suggerisce la scaletta del TG, oltre a una **regia vocale** per impartire comandi al sistema. Le decisioni finali restano alla regia e alla redazione.
+VORTEX Regia Web è un **prototipo funzionale** che riunisce in un unico ambiente software switching, mixer audio, tally, replay, grafiche e rundown. Incorpora **NewsIntelligence**, un aggregatore di notizie basato sull'AI che raccoglie le fonti configurate, valuta le notizie e suggerisce la scaletta del TG, oltre a una **regia vocale** per impartire comandi al sistema. Le decisioni finali restano alla regia e alla redazione.
 
 Le immagini **mostrano il prodotto reale con dati dimostrativi**.
 
